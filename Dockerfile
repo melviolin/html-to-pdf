@@ -1,23 +1,18 @@
+# Dockerfile para Render
 FROM python:3.11-slim
 
-# Instala dependencias necesarias para que WeasyPrint funcione correctamente
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    libpango-1.0-0 \
-    libpangocairo-1.0-0 \
-    libgdk-pixbuf2.0-0 \
-    libcairo2 \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar wkhtmltopdf y dependencias
+RUN apt-get update && apt-get install -y wkhtmltopdf
 
-WORKDIR /app
-
-# Copia los archivos del proyecto
-COPY . .
-
-# Instala dependencias de Python
+# Instalar dependencias Python
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copiar el código de la aplicación
+COPY . /app
+
+# Exponer el puerto
 EXPOSE 8080
 
-# Comando de arranque
+# Comando para ejecutar la app
 CMD ["python", "app.py"]
