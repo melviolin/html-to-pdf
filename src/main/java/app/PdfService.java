@@ -32,7 +32,7 @@ public class PdfService {
             props.setFontProvider(fp);
             props.setCharset("UTF-8");
 
-            HtmlConverter.convertToPdf(html, pdfOutput, props);
+            HtmlConverter.convertToPdf(html, pdfOutput);
 
             return pdfOutput.toByteArray();
         });
