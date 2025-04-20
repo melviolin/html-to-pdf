@@ -1,37 +1,40 @@
-
 package app;
 
 import static spark.Spark.*;
 
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
-import com.itextpdf.io.source.ByteArrayOutputStream;
+import com.itextpdf.io.font.FontConstants;
+import com.itextpdf.io.font.constants.StandardFonts;
+import com.itextpdf.kernel.pdf.PdfWriter;
+import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.layout.font.FontProvider;
 
-import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 
 public class PdfService {
     public static void main(String[] args) {
         port(4567);
 
-        post("/pdf", (req, res) -> {
+        post("/generate", (req, res) -> {
             String html = req.body();
 
-            FontProvider fontProvider = new FontProvider();
-            InputStream fontStream = PdfService.class.getClassLoader()
-                    .getResourceAsStream("fonts/ARIAL.ttf");
-            if (fontStream != null) {
-                fontProvider.addFont(fontStream);
-            }
+            res.type("application/pdf");
+
+            ByteArrayOutputStream pdfOutput = new ByteArrayOutputStream();
 
             ConverterProperties props = new ConverterProperties();
-            props.setFontProvider(fontProvider);
+            FontProvider fp = new FontProvider();
+            fp.addStandardPdfFonts();
+            fp.addDirectory("src/main/resources/fonts"); // Para local
+            fp.addFont(PdfService.class.getClassLoader().getResource("fonts/ARIAL.ttf").getPath()); // Para empaquetado
 
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            HtmlConverter.convertToPdf(html, baos, props);
+            props.setFontProvider(fp);
+            props.setCharset("UTF-8");
 
-            res.type("application/pdf");
-            return baos.toByteArray();
+            HtmlConverter.convertToPdf(html, pdfOutput, props);
+
+            return pdfOutput.toByteArray();
         });
     }
 }
