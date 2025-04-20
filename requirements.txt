@@ -1,2 +1,2 @@
-flask
-reportlab
+flask==2.3.2
+pdfkit==1.0.0
