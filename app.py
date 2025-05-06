@@ -7,14 +7,16 @@ app = Flask(__name__)
 
 @app.route("/generate", methods=["POST"])
 def generate_pdf():
-    html_content = request.get_data(as_text=True)
-    
-    # Configurar wkhtmltopdf (ruta estándar en la mayoría de servidores Linux)
+    data = request.get_json()
+
+    html_content = data.get("html", "")
+    custom_options = data.get("options", {})
+
+    # Configurar wkhtmltopdf (ruta estándar en Linux)
     config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
 
-
-    # Opciones para el PDF
-    options = {
+    # Opciones por defecto
+    default_options = {
         'margin-top': '15mm',
         'margin-right': '15mm',
         'margin-bottom': '15mm',
@@ -24,9 +26,11 @@ def generate_pdf():
         'print-media-type': '',
     }
 
-    # Generar el PDF con márgenes
-    pdf_bytes = pdfkit.from_string(html_content, False, configuration=config, options=options)
+    # Unir opciones por defecto con las que llegaron por JSON (sobrescriben si hay)
+    options = {**default_options, **custom_options}
 
+    # Generar el PDF
+    pdf_bytes = pdfkit.from_string(html_content, False, configuration=config, options=options)
     pdf_output = io.BytesIO(pdf_bytes)
 
     return send_file(pdf_output, mimetype='application/pdf', as_attachment=True, download_name="documento.pdf")
