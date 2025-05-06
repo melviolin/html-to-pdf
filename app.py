@@ -10,18 +10,10 @@ def generate_pdf():
     data = request.get_json()
 
     html_content = data.get("html", "")
-    custom_options = data.get("options", {})
+    options = data.get("options", {})
 
     # Configurar wkhtmltopdf (ruta estándar en Linux)
     config = pdfkit.configuration(wkhtmltopdf="/usr/bin/wkhtmltopdf")
-
-    # Opciones por defecto
-    default_options = {
-        'encoding': 'UTF-8',
-    }
-
-    # Unir opciones por defecto con las que llegaron por JSON (sobrescriben si hay)
-    options = {**default_options, **custom_options}
 
     # Generar el PDF
     pdf_bytes = pdfkit.from_string(html_content, False, configuration=config, options=options)
