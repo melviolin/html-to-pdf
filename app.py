@@ -17,13 +17,7 @@ def generate_pdf():
 
     # Opciones por defecto
     default_options = {
-        'margin-top': '15mm',
-        'margin-right': '15mm',
-        'margin-bottom': '15mm',
-        'margin-left': '15mm',
         'encoding': 'UTF-8',
-        'page-size': 'A4',
-        'print-media-type': '',
     }
 
     # Unir opciones por defecto con las que llegaron por JSON (sobrescriben si hay)
